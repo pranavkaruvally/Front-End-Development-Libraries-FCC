@@ -1,5 +1,4 @@
 import React from 'react';
-import "./Clicker.js";
 
 export default class Clicker extends React.Component {
     Clicker(props) {
