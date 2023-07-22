@@ -3,13 +3,17 @@ import React from "react";
 // import Clicker from './components/quote_box/Clicker.js';
 
 function App() {
-  const myQuote = "Life is what happens to you, While you're busy making other plans.";
+  document.body.style = "background-color: #73A857";
+
+  const appStyle= {
+    "display": "flex",
+    "alignItems": "center",
+    "justifyContent": "center",
+    "height": "100vh",
+  }
   return (
-    <div className="App">
-      <Clicker id="#new-quote" color="#73A857" content="New quote"/><br/>
-      <Clicker id="#tweet-quote" color="#73A857" content="a">a</Clicker><br/>
-      <QuoteAuthor id="#author" color="#73A857" authorName="John Lennon" /><br/>
-      <QuoteText quote={myQuote} color="#73A857"/>
+    <div style={appStyle}>
+      <QuoteBox color="#73A857"/>
     </div>
   );
 }
@@ -32,7 +36,10 @@ class Clicker extends React.Component {
           "padding": "8px 18px 6px 18px",
           "cursor": "pointer",
       }
-      return <button style={buttonStyle}>{ this.props.content }</button>;
+
+      const clickStyle = (this.props.clickStyle == null) ? buttonStyle : Object.assign(this.props.clickStyle, buttonStyle);
+      
+      return <button style={clickStyle}>{ this.props.content }</button>;
   }
 }
 
@@ -45,6 +52,7 @@ class QuoteAuthor extends React.Component {
     const authorStyle = {
       "color": this.props.color,
       "font": "16px Raleway, sans-serif",
+      "float": "right",
     };
     return <p style={authorStyle}> - {this.props.authorName}</p>
   }
@@ -73,4 +81,38 @@ class QuoteText extends React.Component {
       </div>
     );
   }
+}
+
+class QuoteBox extends React.Component {
+  QuoteBox(props) {
+    this.super(props);
+  }
+
+  render() {
+    const myQuote = "Life is what happens to you, While you're busy making other plans.";
+
+    const quoteBoxStyle = {
+      "border-radius": "3px",
+      "width": "450px",
+      "padding": "40px 50px",
+      "background-color": "#ffffff",
+    }
+
+    const newQuoteStyle = {
+      "position": "relative",
+      "right": -180,
+    }
+
+    return (
+      <div style={quoteBoxStyle}>
+        <QuoteText quote={myQuote} color={this.props.color}/>
+        <QuoteAuthor id="#author" color={this.props.color} authorName="John Lennon" /><br/><br/>
+        <div className="buttons" style={{"display": "flex", "justifyContent": "space-between"}}>
+          <Clicker id="#tweet-quote" color={this.props.color} content="a" /><br/>
+          <Clicker id="#new-quote" clickStyle={newQuoteStyle} color={this.props.color} content="New quote"/><br/>
+        </div>
+      </div>
+    );
+  }
+
 }
