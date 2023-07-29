@@ -1,6 +1,5 @@
 import './App.css';
 import React, { useState } from "react";
-// import Clicker from './components/quote_box/Clicker.js';
 
 function App() {
   const appStyle= {
@@ -21,36 +20,29 @@ export default App;
 class Clicker extends React.Component {
   Clicker(props) {
       this.super(props);
-      console.log("Attached");
-  }
-
-  updateColorFunction() {
-    const colorSet = ["#73A857", "#F39C12", "#BDBB99", "#E74C3C", "#9B59B6", "#2C3E50", "#FB6964", "#77B1A9", "#342224"];
-    let num = Math.floor(Math.random() * 10)%9;
-    this.props.updateColor(colorSet[num]);
   }
 
   async getQuote() {
-    if (typeof this.props.updateColor === "function") {
-      const url = 'https://api.quotable.io/quotes/random';
-      const options = {
-        method: 'GET',
-      };
+    const colorSet = ["#73A857", "#F39C12", "#BDBB99", "#E74C3C", "#9B59B6", "#2C3E50", "#FB6964", "#77B1A9", "#342224"];
+    const url = 'https://api.quotable.io/quotes/random';
+    const options = {
+      method: 'GET',
+    };
 
-      try {
-        const response = await fetch(url, options);
-        const result = await response.text();
-        const resultJson = JSON.parse(result)[0];
-        this.props.updateQuote(resultJson['content']);
-        this.props.updateAuthor(resultJson['author']);
-        this.updateColorFunction();
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
-      console.log("This function does nothing");
+    try {
+      const response = await fetch(url, options);
+      const result = await response.text();
+      const resultJson = JSON.parse(result)[0];
+      this.props.setStates('quote', resultJson['content']);
+      this.props.setStates('author', resultJson['author']);
+
+      //To change the color at random
+      let num = Math.floor(Math.random() * 10)%9;
+      this.props.setStates('color', colorSet[num]);
+    } catch (error) {
+      console.error(error);
     }
-  }
+}
 
   render() {
       const buttonStyle = {
@@ -63,10 +55,11 @@ class Clicker extends React.Component {
           "margin": "30px 0px 0px 0px",
           "padding": "8px 18px 6px 18px",
           "cursor": "pointer",
+          "position": "relative",
+          "right": -180
       }
 
-      const clickStyle = (this.props.clickStyle == null) ? buttonStyle : Object.assign(this.props.clickStyle, buttonStyle);
-      return <button onClick={() => this.getQuote()} style={clickStyle}>{ this.props.content }</button>;
+      return <button onClick={() => this.getQuote()} style={buttonStyle}>{ this.props.content }</button>;
   }
 }
 
@@ -121,16 +114,28 @@ function QuoteBox() {
     "backgroundColor": "#ffffff",
   }
 
-  const newQuoteStyle = {
-    "position": "relative",
-    "right": -180,
-  }
-
   const colorSet = ["#73A857", "#F39C12", "#BDBB99", "#E74C3C", "#9B59B6", "#2C3E50", "#FB6964", "#77B1A9", "#342224"];
   const num = Math.floor(Math.random()*10)%9;
   const [appColor, updateColor] = useState(colorSet[num]);
   const [quote, updateQuote] = useState(myQuote);
   const [author, updateAuthor] = useState(myAuthor)
+
+  // const myStates = {
+  //   colorState: updateColor,
+  //   quoteState: updateQuote,
+  //   authorState: updateAuthor
+  // }
+
+  function callState(myState, value) {
+    if (myState === 'color')
+      updateColor(value);
+    else if (myState === 'quote')
+      updateQuote(value);
+    else if (myState === 'author')
+      updateAuthor(value);
+    else
+      return null;
+  }
 
   const aStyle = {
     "color": "white",
@@ -153,7 +158,7 @@ function QuoteBox() {
         <a id="tweet-quote" href="https://twitter.com/intent/tweet"><button style={aStyle}>
           <b>t</b>
           </button></a>
-        <Clicker id="new-quote" updateQuote={updateQuote} updateAuthor={updateAuthor} updateColor={updateColor} clickStyle={newQuoteStyle} color={appColor} content="New quote"/><br/>
+        <Clicker id="new-quote" setStates={callState} color={appColor} content="New quote"/><br/>
       </div>
     </div>
   );
